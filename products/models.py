@@ -120,7 +120,7 @@ def product_pre_save(sender, instance, *args, **kwargs):
 
 
 def product_image_upload_path(instance, filename):
-    return f'product-images/{instance.product.id}/{filename}'
+    return f'products-images/{instance.product.id}/{filename}'
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)

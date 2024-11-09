@@ -33,8 +33,12 @@ from rest_framework.routers import DefaultRouter
 
 from users.views import *
 from categories.views import CategoryViewSet
-from products.views import ProductViewSet,ProductImageViewSet,MaterialViewSet
-
+from products.views import (
+    ProductViewSet,
+    ProductImageViewSet,
+    MaterialViewSet
+)
+from support.views import SupportViewSet
 
 router = DefaultRouter()
 
@@ -87,12 +91,31 @@ path(
         ChangePasswordView.as_view(),
         name="change_password",
     ),
-    # __________________________ Categories Endpoints _________________________________#
+    # __________________________  Endpoints _________________________________#
 
     path('', include(router.urls)),
     
-    # __________________________ Products Endpoints _________________________________#
-
+        # ______________________________ Support Resquest end points ___________________________________#
+    path(
+        "support/",
+        SupportViewSet.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+        name="support-list-create",
+    ),
+    path(
+        "support/<int:pk>/",
+        SupportViewSet.as_view(
+            {
+                "get": "retrieve",
+                "delete": "destroy",
+            }
+        ),
+        name="support-retrieve",
+    ),
     
 ]
 

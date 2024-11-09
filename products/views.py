@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Category, Material, Product, ProductImage
 from .serializers import CategorySerializer, MaterialSerializer, ProductSerializer, ProductImageSerializer
+from dynamic_rest.viewsets import DynamicModelViewSet
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

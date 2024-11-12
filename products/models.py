@@ -1,10 +1,10 @@
 import random
 import string
+import re
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.core.exceptions import ValidationError
-import re
 from categories.models import Category
 
 
@@ -13,13 +13,10 @@ class ArabicSlugify:
     
     @staticmethod
     def slugify(text):
-        # Replace spaces with hyphens
+        # Replace spaces with hyphens and keep Arabic, English letters, numbers, or hyphens
         text = re.sub(r'\s+', '-', text.strip())
-        # Remove any characters that aren't Arabic letters, English letters, numbers, or hyphens
         text = re.sub(r'[^\u0600-\u06FF\w\-]', '', text)
-        # Ensure there are no leading or trailing hyphens
-        text = text.strip('-')
-        return text
+        return text.strip('-')
 
 
 class Material(models.Model):
@@ -47,15 +44,16 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return self.name
 
     @staticmethod
     def generate_sku():
         """Generate a unique 12-character SKU with uppercase letters and numbers."""
-        characters = string.ascii_uppercase + string.digits
-        sku = ''.join(random.choices(characters, k=12))
-        return sku
+        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=12))
 
     def generate_slug(self):
         """Generate a unique slug for the product name."""
@@ -75,52 +73,51 @@ class Product(models.Model):
         return slug
 
     def clean(self):
-        """Field-level validation."""
+        """Model validation for custom constraints."""
+        errors = {}
         if self.price <= 0:
-            raise ValidationError("Price must be positive.")
+            errors['price'] = "Price must be positive."
         if self.stock is not None and self.stock < 0:
-            raise ValidationError("Stock cannot be negative.")
+            errors['stock'] = "Stock cannot be negative."
         if self.width_cm is not None and self.width_cm <= 0:
-            raise ValidationError("Width must be a positive number.")
+            errors['width_cm'] = "Width must be a positive number."
         if self.height_cm is not None and self.height_cm <= 0:
-            raise ValidationError("Height must be a positive number.")
+            errors['height_cm'] = "Height must be a positive number."
         if self.depth_cm is not None and self.depth_cm <= 0:
-            raise ValidationError("Depth must be a positive number.")
-
+            errors['depth_cm'] = "Depth must be a positive number."
+        
+        if errors:
+            raise ValidationError(errors)
 
     def save(self, *args, **kwargs):
-        """Override save method to ensure the slug is updated on name change."""
-        if self.pk:  # If the product already exists
-            original = Product.objects.get(pk=self.pk)
-            if original.name != self.name:
-                self.slug = self.generate_slug()  # Generate new slug if name has changed
-        else:
-            self.slug = self.generate_slug()  # Generate slug when creating a new product
-
-        super().save(*args, **kwargs)
+        """Ensure slug and SKU are set appropriately on save."""
+        if not self.slug:
+            self.slug = self.generate_slug()
         
-    class Meta:
-        ordering = ['-created_at']
+        if not self.sku:
+            self.sku = self.generate_sku()
+            while Product.objects.filter(sku=self.sku).exists():
+                self.sku = self.generate_sku()
+        
+        super().save(*args, **kwargs)
 
 
 @receiver(pre_save, sender=Product)
 def product_pre_save(sender, instance, *args, **kwargs):
-    """Signal to set slug and SKU before saving."""
-    # Generate slug if it doesn't exist
+    """Signal to set slug and SKU before saving if they are empty."""
     if not instance.slug:
         instance.slug = instance.generate_slug()
-
-    # Generate SKU if it doesn't exist
     if not instance.sku:
         unique_sku = instance.generate_sku()
-        # Ensure SKU uniqueness in the database
         while Product.objects.filter(sku=unique_sku).exists():
             unique_sku = instance.generate_sku()
         instance.sku = unique_sku
 
 
 def product_image_upload_path(instance, filename):
-    return f'products-images/{instance.product.id}/{filename}'
+    """Generate dynamic upload path for product images."""
+    return f'products-images/{instance.product.id or "temp"}/{filename}'
+
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, related_name='images', on_delete=models.CASCADE)

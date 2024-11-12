@@ -3,8 +3,6 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Category, Material, Product, ProductImage
 from .serializers import CategorySerializer, MaterialSerializer, ProductSerializer, ProductImageSerializer
-from dynamic_rest.viewsets import DynamicModelViewSet
-
 
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
@@ -21,54 +19,55 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
     def create(self, request, *args, **kwargs):
-        # Custom handling for multiple images on product creation
-        images = request.FILES.getlist('image_files')  # Get list of uploaded files with 'image_files' key
+        images = request.FILES.getlist('image_files')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         product = serializer.save()
 
-        # Save images
+        # Save and validate images
         for image in images:
-            ProductImage.objects.create(product=product, image=image)
+            image_serializer = ProductImageSerializer(data={'image': image})
+            image_serializer.is_valid(raise_exception=True)
+            image_serializer.save(product=product)
 
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
-        # Custom handling for multiple images on product update
-        images = request.FILES.getlist('image_files')  # Get list of uploaded files with 'image_files' key
+        images = request.FILES.getlist('image_files')
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         product = serializer.save()
 
-        # Optionally clear existing images or append new ones
         if images:
-            # Uncomment the next line if you want to remove existing images on each update
+            # Uncomment this line to delete existing images before adding new ones
             # instance.images.all().delete()
-            
             for image in images:
-                ProductImage.objects.create(product=product, image=image)
+                image_serializer = ProductImageSerializer(data={'image': image})
+                image_serializer.is_valid(raise_exception=True)
+                image_serializer.save(product=product)
 
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def add_images(self, request, pk=None):
-        """Endpoint to add multiple images to an existing product and return their paths."""
         product = self.get_object()
         images = request.FILES.getlist('images')
-        
+
         if not images:
             return Response(
                 {"detail": "No images provided."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         image_paths = []
         for image in images:
-            product_image = ProductImage.objects.create(product=product, image=image)
-            image_paths.append(product_image.image.url)  # Collect the image URL
+            image_serializer = ProductImageSerializer(data={'image': image})
+            if image_serializer.is_valid(raise_exception=True):
+                product_image = image_serializer.save(product=product)
+                image_paths.append(product_image.image.url)
 
         return Response(
             {
@@ -77,6 +76,25 @@ class ProductViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_201_CREATED
         )
+
+    @action(detail=True, methods=['delete'])
+    def delete_images(self, request, pk=None):
+        """Endpoint to delete multiple images from a product."""
+        product = self.get_object()
+        image_ids = request.data.get('image_ids', [])
+        
+        if not image_ids:
+            return Response(
+                {"detail": "No image IDs provided."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        deleted_count, _ = ProductImage.objects.filter(id__in=image_ids, product=product).delete()
+        return Response(
+            {"detail": f"{deleted_count} images deleted from product {product.name}."},
+            status=status.HTTP_200_OK
+        )
+
 class ProductImageViewSet(viewsets.ModelViewSet):
     queryset = ProductImage.objects.all()
     serializer_class = ProductImageSerializer

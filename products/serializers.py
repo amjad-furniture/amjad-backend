@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Category, Material, Product, ProductImage
 from categories.serializers import CategorySerializer
+from urllib.parse import unquote
 
 class MaterialSerializer(serializers.ModelSerializer):
     class Meta:
@@ -46,6 +47,8 @@ class ProductSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
+    product_video = serializers.FileField(write_only=True, required=False)  # Add the video field
+
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     updated_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 
@@ -54,14 +57,22 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'category', 'category_id', 'materials', 'material_ids', 'name', 'sku', 'slug', 'description', 
             'price', 'color', 'width_cm', 'height_cm', 'depth_cm', 'stock', 'country_of_origin', 
-            'images', 'uploaded_images', 'created_at', 'updated_at'
+            'images', 'uploaded_images', 'product_video', 'created_at', 'updated_at'
         ]
         read_only_fields = ['sku', 'slug', 'created_at', 'updated_at', 'images']
+
+    def validate_product_video(self, value):
+        """Validate the uploaded video file."""
+        if not value.name.lower().endswith(('.mp4', '.mov', '.avi', '.mkv')):
+            raise serializers.ValidationError("Only MP4, MOV, AVI, and MKV video formats are allowed.")
+        if value.size > 1 * 1024 * 1024 * 1024:
+            raise serializers.ValidationError("Video file size should not exceed 1GB.")
+        return value
 
     def create(self, validated_data):
         materials = validated_data.pop('materials', [])
         images_data = validated_data.pop('uploaded_images', [])
-        
+        video_data = validated_data.pop('product_video', None)
         product = Product.objects.create(**validated_data)
         
         if materials:
@@ -69,13 +80,18 @@ class ProductSerializer(serializers.ModelSerializer):
         
         for image in images_data:
             ProductImage.objects.create(product=product, image=image)
+
+        if video_data:
+            product.product_video = video_data
+            product.save()
         
         return product
     
     def update(self, instance, validated_data):
         materials = validated_data.pop('materials', None)
         images = validated_data.pop('uploaded_images', None)
-        
+        video_data = validated_data.pop('product_video', None)
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -86,9 +102,25 @@ class ProductSerializer(serializers.ModelSerializer):
         if images:
             for image in images:
                 ProductImage.objects.create(product=instance, image=image)
-        
+        if video_data:
+            instance.product_video = video_data
+            instance.save()
+
         return instance
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
+        
+        # Check if product_video exists
+        if instance.product_video:
+            request = self.context.get('request')
+            video_url = instance.product_video.url
+
+            # If the request context is available, build an absolute URL
+            if request is not None:
+                video_url = request.build_absolute_uri(video_url)
+
+            # Set the full video URL in the response
+            representation['product_video'] = video_url
+    
         return representation

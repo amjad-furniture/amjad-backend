@@ -36,11 +36,13 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True, verbose_name="Description")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price")
     color = models.CharField(max_length=50, verbose_name="Color", blank=True, null=True)
+    length_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Length (cm)")
     width_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Width (cm)")
     height_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Height (cm)")
     depth_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Depth (cm)")
     stock = models.IntegerField(null=True, blank=True, verbose_name="Stock")
     country_of_origin = models.CharField(max_length=100, blank=True, null=True, verbose_name="Country of Origin")
+    product_video = models.FileField(upload_to='products-videos/', blank=True, null=True, verbose_name="Product Video")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

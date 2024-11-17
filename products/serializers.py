@@ -47,8 +47,6 @@ class ProductSerializer(serializers.ModelSerializer):
         write_only=True,
         required=False
     )
-    product_video = serializers.FileField(write_only=True, required=False)  # Add the video field
-
     created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
     updated_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
 

@@ -244,10 +244,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
+
 # Edit these values in production!
-CORS_ALLOW_ALL_ORIGINS = True
-ALLOWED_HOSTS = ["*"]
+CORS_ALLOWED_ORIGINS = [
+    "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
+]
+# Allow all HTTP methods and headers
+CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+CORS_ALLOW_HEADERS = ["*"]
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ['https://gym-backend-production-65cc.up.railway.app']
+CSRF_TRUSTED_ORIGINS = [
+    "http://104.248.251.235:8080",
+    "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
+]

@@ -38,8 +38,15 @@ class Product(models.Model):
     fabric_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة القماش")
     upholstery_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة التنجيد")
     warranty_months = models.PositiveIntegerField(blank=True, null=True, verbose_name="عدد شهور الضمان")
+    is_active = models.BooleanField(default=True, help_text="Set to False to hide the product from being displayed.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    # Optional: Add a custom manager if you want to filter only active products by default
+    objects = models.Manager()  # Default manager
+    active = models.Manager.from_queryset(
+        lambda qs: qs.filter(is_active=True)
+    )()
 
     class Meta:
         ordering = ['-created_at']

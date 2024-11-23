@@ -14,6 +14,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
+    
+    def get_queryset(self):
+        if self.request.method == 'GET' and not self.request.user.is_authenticated:
+            return Product.objects.filter(is_active=True)
+        return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         images = request.FILES.getlist('image_files')
@@ -47,6 +52,18 @@ class ProductViewSet(viewsets.ModelViewSet):
                 image_serializer.save(product=product)
 
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated])
+    def toggle_status(self, request, pk=None):
+        """Endpoint to toggle the visibility of a product."""
+        product = self.get_object()
+        product.is_active = not product.is_active
+        product.save()
+        status_message = "activated" if product.is_active else "deactivated"
+        return Response(
+            {"detail": f"Product '{product.name}' has been {status_message}."},
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=['post'])
     def add_images(self, request, pk=None):

@@ -44,7 +44,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'price', 'color', 'length_cm', 'width_cm', 'height_cm', 'depth_cm', 'stock', 
             'country_of_origin','wood_material', 'fabric_material',
             'upholstery_material', 'warranty_months','images', 'uploaded_images', 'product_video', 
-            'created_at', 'updated_at'
+            'is_active','created_at', 'updated_at'
         ]
         read_only_fields = ['sku', 'slug', 'created_at', 'updated_at', 'images']
 

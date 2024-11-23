@@ -19,17 +19,8 @@ class ArabicSlugify:
         return text.strip('-')
 
 
-class Material(models.Model):
-    name = models.CharField(max_length=255, unique=True, verbose_name="Material Name")
-    description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        return self.name
-
-
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Category")
-    materials = models.ManyToManyField(Material, related_name='products', verbose_name="Materials")
     name = models.CharField(unique=True, max_length=100, verbose_name="Product Name")
     sku = models.CharField(max_length=12, unique=True, blank=True, editable=False, verbose_name="SKU")
     slug = models.SlugField(max_length=100, unique=True, blank=True, allow_unicode=True, verbose_name="Slug")
@@ -43,6 +34,10 @@ class Product(models.Model):
     stock = models.IntegerField(null=True, blank=True, verbose_name="Stock")
     country_of_origin = models.CharField(max_length=100, blank=True, null=True, verbose_name="Country of Origin")
     product_video = models.FileField(upload_to='products-videos/', blank=True, null=True, verbose_name="Product Video")
+    wood_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة الخشب")
+    fabric_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة القماش")
+    upholstery_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة التنجيد")
+    warranty_months = models.PositiveIntegerField(blank=True, null=True, verbose_name="عدد شهور الضمان")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

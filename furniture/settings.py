@@ -260,6 +260,6 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://104.248.251.235:8080",
+    "https://amjad-backend-production.up.railway.app",
     "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
 ]

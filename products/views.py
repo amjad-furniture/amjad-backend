@@ -16,8 +16,16 @@ class ProductViewSet(viewsets.ModelViewSet):
         return [IsAuthenticated()]
     
     def get_queryset(self):
-        if self.request.method == 'GET' and not self.request.user.is_authenticated:
-            return Product.objects.filter(is_active=True)
+    # Handle GET requests separately for unauthenticated users
+        if self.request.method == 'GET':
+            if self.request.user.is_authenticated:
+                # Authenticated users see all products
+                return Product.objects.all()
+            else:
+                # Unauthenticated users see only active products
+                return Product.objects.filter(is_active=True)
+
+        # For non-GET methods, return the default queryset (all products)
         return super().get_queryset()
 
     def create(self, request, *args, **kwargs):

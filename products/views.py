@@ -1,9 +1,14 @@
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from .models import Product, ProductImage
 from .serializers import ProductSerializer, ProductImageSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from categories.models import Category
+from support.models import Support
+from datetime import timedelta
+from django.utils.timezone import now
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -126,3 +131,53 @@ class ProductImageViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
+
+
+class DashboardStatsView(APIView):
+    """
+    API View to provide dashboard statistics.
+    """
+
+    def get(self, request, *args, **kwargs):
+        # 1. All products
+        total_products = Product.objects.count()
+
+        # 2. All active products
+        active_products = Product.objects.filter(is_active=True).count()
+
+        # 3. All inactive products
+        inactive_products = Product.objects.filter(is_active=False).count()
+
+        # 4. All categories
+        total_categories = Category.objects.count()
+
+        # 5. Number of products for each category
+        categories = Category.objects.all()
+        category_stats = [
+            {
+                "category_name": category.name,
+                "product_count": Product.objects.filter(category=category).count(),
+            }
+            for category in categories
+        ]
+
+        # 6. All messages
+        total_support_messages = Support.objects.count()
+
+        # 7. New messages (last 24 hours)
+        new_support_messages = Support.objects.filter(
+            created_at__gte=now() - timedelta(days=1)
+        ).count()
+
+        # Prepare response data
+        data = {
+            "total_products": total_products,
+            "active_products": active_products,
+            "inactive_products": inactive_products,
+            "total_categories": total_categories,
+            "category_stats": category_stats,
+            "total_support_messages": total_support_messages,
+            "new_support_messages": new_support_messages,
+        }
+
+        return Response(data)

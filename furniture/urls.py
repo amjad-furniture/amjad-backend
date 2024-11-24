@@ -36,6 +36,7 @@ from categories.views import CategoryViewSet
 from products.views import (
     ProductViewSet,
     ProductImageViewSet,
+    DashboardStatsView,
 )
 from support.views import SupportViewSet
 
@@ -48,8 +49,7 @@ router.register(r'product-images', ProductImageViewSet)
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     path(
         "api/schema/",
         SpectacularAPIView.as_view(),
@@ -65,11 +65,8 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="schema"),
         name="redoc",
     ),
-    
-    
     # __________________________ Authentication Endpoints _________________________________#
-
-path(
+    path(
         "auth/login",
         LoginView.as_view(),
         name="login",
@@ -90,10 +87,8 @@ path(
         name="change_password",
     ),
     # __________________________  Endpoints _________________________________#
-
-    path('', include(router.urls)),
-    
-        # ______________________________ Support Resquest end points ___________________________________#
+    path("", include(router.urls)),
+    # ______________________________ Support Resquest end points ___________________________________#
     path(
         "support/",
         SupportViewSet.as_view(
@@ -114,8 +109,11 @@ path(
         ),
         name="support-retrieve",
     ),
-    
+    path("dashboard-stats/",
+        DashboardStatsView.as_view(),
+        name="dashboard_stats"),
 ]
+
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()

@@ -13,3 +13,6 @@ class Support(models.Model):
 
     def __str__(self):
         return f"Support Request for {self.phone_number}"
+    
+    class Meta:
+        ordering = ['-created_at']

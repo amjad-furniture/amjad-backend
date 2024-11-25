@@ -61,14 +61,14 @@ INTERNAL_IPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
 ]
 
@@ -249,6 +249,7 @@ ALLOWED_HOSTS = ['*']
 # Edit these values in production!
 CORS_ALLOWED_ORIGINS = [
     "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
+    "http://localhost:3000",
 ]
 # Allow all HTTP methods and headers
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"]

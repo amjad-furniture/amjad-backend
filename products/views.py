@@ -9,6 +9,7 @@ from categories.models import Category
 from support.models import Support
 from datetime import timedelta
 from django.utils.timezone import now
+from rest_framework.exceptions import NotFound
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -131,6 +132,35 @@ class ProductImageViewSet(viewsets.ModelViewSet):
         if self.request.method == 'GET':
             return [AllowAny()]
         return [IsAuthenticated()]
+
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
+from products.models import Product
+from categories.models import Category
+from products.serializers import ProductSerializer  # Assuming you have a serializer
+
+
+class ProductsByCategoryView(APIView):
+    """
+    API View to retrieve all products for a specific category.
+    """
+
+    def get(self, request, category_id, *args, **kwargs):
+        try:
+            # Get the category by ID
+            category = Category.objects.get(id=category_id)
+        except Category.DoesNotExist:
+            raise NotFound(detail="Category not found")
+
+        # Retrieve all products for this category 
+        products = Product.objects.filter(category=category)
+
+        # Serialize the products
+        serializer = ProductSerializer(products, many=True)
+
+        return Response({"category": category.name, "products": serializer.data})
 
 
 class DashboardStatsView(APIView):

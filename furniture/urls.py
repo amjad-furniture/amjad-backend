@@ -36,6 +36,7 @@ from categories.views import CategoryViewSet
 from products.views import (
     ProductViewSet,
     ProductImageViewSet,
+    ProductsByCategoryView,
     DashboardStatsView,
 )
 from support.views import SupportViewSet
@@ -109,9 +110,12 @@ urlpatterns = [
         ),
         name="support-retrieve",
     ),
-    path("dashboard-stats/",
-        DashboardStatsView.as_view(),
-        name="dashboard_stats"),
+    path(
+        "category/<int:category_id>/products/",
+        ProductsByCategoryView.as_view(),
+        name="products_by_category",
+    ),
+    path("dashboard-stats/", DashboardStatsView.as_view(), name="dashboard_stats"),
 ]
 
 

@@ -18,7 +18,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
     def get_permissions(self):
-        if self.request.method == ["GET", "PATCH"]:
+        if self.request.method == "GET":
             return [AllowAny()]
         return [IsAuthenticated()]
 

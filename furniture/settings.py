@@ -149,10 +149,10 @@ REST_FRAMEWORK = {
         "renderers.CustomJSONRenderer",  # Custom JSON format for responses
         "rest_framework.renderers.BrowsableAPIRenderer",  # Optional, for the DRF web interface
     ],
-    # "DEFAULT_AUTHENTICATION_CLASSES": ["custom.CustomJWTAuthentication"],
-    # "DEFAULT_PERMISSION_CLASSES": [
-    #     "rest_framework.permissions.IsAuthenticated",
-    # ],
+    "DEFAULT_AUTHENTICATION_CLASSES": ["custom.CustomJWTAuthentication"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+    ],
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",

@@ -10,6 +10,7 @@ from support.models import Support
 from datetime import timedelta
 from django.utils.timezone import now
 from rest_framework.exceptions import NotFound
+from django.db.models import Q
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -25,18 +26,22 @@ class ProductViewSet(viewsets.ModelViewSet):
         # Base queryset
         queryset = Product.objects.all()
 
-        # Handle query parameters for filtering
+        # Get query parameters
         name = self.request.query_params.get("name")
-        price = self.request.query_params.get("price")  # New parameter for exact price
+        price = self.request.query_params.get("price")
         price_min = self.request.query_params.get("price_min")
         price_max = self.request.query_params.get("price_max")
         color = self.request.query_params.get("color")
         category_id = self.request.query_params.get("category")
         order_by_price = self.request.query_params.get("order_by_price")
+        search = self.request.query_params.get("search")  # New search parameter
 
         # Apply filters dynamically
+
+        # If 'name' is provided, filter by product name
         if name:
             queryset = queryset.filter(name__icontains=name)
+
         if price:
             queryset = queryset.filter(price=price)
         if price_min:
@@ -47,6 +52,14 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(color__icontains=color)
         if category_id:
             queryset = queryset.filter(category_id=category_id)
+
+        # Search functionality: filter across name and description
+        if search:
+            queryset = queryset.filter(
+                Q(name__icontains=search)
+                | Q(description__icontains=search)
+                | Q(color__icontains=search)
+            )
 
         # Apply ordering by price
         if order_by_price == "max":

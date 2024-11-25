@@ -17,22 +17,48 @@ class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             return [AllowAny()]
         return [IsAuthenticated()]
-    
-    def get_queryset(self):
-    # Handle GET requests separately for unauthenticated users
-        if self.request.method == 'GET':
-            if self.request.user.is_authenticated:
-                # Authenticated users see all products
-                return Product.objects.all()
-            else:
-                # Unauthenticated users see only active products
-                return Product.objects.filter(is_active=True)
 
-        # For non-GET methods, return the default queryset (all products)
-        return super().get_queryset()
+    def get_queryset(self):
+        # Base queryset
+        queryset = Product.objects.all()
+
+        # Handle query parameters for filtering
+        name = self.request.query_params.get("name")
+        price = self.request.query_params.get("price")  # New parameter for exact price
+        price_min = self.request.query_params.get("price_min")
+        price_max = self.request.query_params.get("price_max")
+        color = self.request.query_params.get("color")
+        category_id = self.request.query_params.get("category")
+        order_by_price = self.request.query_params.get("order_by_price")
+
+        # Apply filters dynamically
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+        if price:
+            queryset = queryset.filter(price=price)
+        if price_min:
+            queryset = queryset.filter(price__gte=price_min)
+        if price_max:
+            queryset = queryset.filter(price__lte=price_max)
+        if color:
+            queryset = queryset.filter(color__icontains=color)
+        if category_id:
+            queryset = queryset.filter(category_id=category_id)
+
+        # Apply ordering by price
+        if order_by_price == "max":
+            queryset = queryset.order_by("-price")  # Order by descending price
+        elif order_by_price == "min":
+            queryset = queryset.order_by("price")  # Order by ascending price
+
+        # Handle unauthenticated users to return only active products
+        if self.request.method == "GET" and not self.request.user.is_authenticated:
+            queryset = queryset.filter(is_active=True)
+
+        return queryset
 
     def create(self, request, *args, **kwargs):
         images = request.FILES.getlist('image_files')
@@ -66,7 +92,7 @@ class ProductViewSet(viewsets.ModelViewSet):
                 image_serializer.save(product=product)
 
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['patch'], permission_classes=[IsAuthenticated])
     def toggle_status(self, request, pk=None):
         """Endpoint to toggle the visibility of a product."""
@@ -110,7 +136,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         """Endpoint to delete multiple images from a product."""
         product = self.get_object()
         image_ids = request.data.get('image_ids', [])
-        
+
         if not image_ids:
             return Response(
                 {"detail": "No image IDs provided."},

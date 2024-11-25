@@ -38,23 +38,22 @@ AUTH_USER_MODEL = "users.User"
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework_simplejwt',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "rest_framework",
+    "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
-    'drf_spectacular',
+    "drf_spectacular",
     "debug_toolbar",
     "corsheaders",
-    'users',
-    'categories',
-    'products',
-    'support',
-    
+    "users",
+    "categories",
+    "products",
+    "support",
 ]
 
 INTERNAL_IPS = [
@@ -112,7 +111,6 @@ DATABASES = {
         conn_max_age=600,
     )
 }
-
 
 
 # DATABASES = {
@@ -207,7 +205,6 @@ SIMPLE_JWT = {
     "JSON_ENCODER": None,  # specify a custom JSON encoder class if your tokens need special encoding
     "JWK_URL": None,  # URL for JSON Web Key Set
 }
-
 
 
 # Internationalization

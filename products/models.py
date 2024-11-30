@@ -38,10 +38,13 @@ class Product(models.Model):
     fabric_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة القماش")
     upholstery_material = models.CharField(max_length=255, blank=True, null=True, verbose_name="خامة التنجيد")
     warranty_months = models.PositiveIntegerField(blank=True, null=True, verbose_name="عدد شهور الضمان")
+    is_best_seller = models.BooleanField(
+        default=False, help_text="Mark this product as a best seller."
+    )
     is_active = models.BooleanField(default=True, help_text="Set to False to hide the product from being displayed.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     # Optional: Add a custom manager if you want to filter only active products by default
     objects = models.Manager()  # Default manager
     active = models.Manager.from_queryset(
@@ -89,7 +92,7 @@ class Product(models.Model):
             errors['height_cm'] = "Height must be a positive number."
         if self.depth_cm is not None and self.depth_cm <= 0:
             errors['depth_cm'] = "Depth must be a positive number."
-        
+
         if errors:
             raise ValidationError(errors)
 
@@ -97,12 +100,12 @@ class Product(models.Model):
         """Ensure slug and SKU are set appropriately on save."""
         if not self.slug:
             self.slug = self.generate_slug()
-        
+
         if not self.sku:
             self.sku = self.generate_sku()
             while Product.objects.filter(sku=self.sku).exists():
                 self.sku = self.generate_sku()
-        
+
         super().save(*args, **kwargs)
 
 

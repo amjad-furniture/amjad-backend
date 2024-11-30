@@ -40,11 +40,32 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            'id', 'category', 'category_id', 'name', 'sku', 'slug', 'description', 
-            'price', 'color', 'length_cm', 'width_cm', 'height_cm', 'depth_cm', 'stock', 
-            'country_of_origin','wood_material', 'fabric_material',
-            'upholstery_material', 'warranty_months','images', 'uploaded_images', 'product_video', 
-            'is_active','created_at', 'updated_at'
+            "id",
+            "category",
+            "category_id",
+            "name",
+            "sku",
+            "slug",
+            "description",
+            "price",
+            "color",
+            "length_cm",
+            "width_cm",
+            "height_cm",
+            "depth_cm",
+            "stock",
+            "country_of_origin",
+            "wood_material",
+            "fabric_material",
+            "upholstery_material",
+            "warranty_months",
+            "images",
+            "uploaded_images",
+            "product_video",
+            "is_best_seller",
+            "is_active",
+            "created_at",
+            "updated_at",
         ]
         read_only_fields = ['sku', 'slug', 'created_at', 'updated_at', 'images']
 
@@ -60,16 +81,16 @@ class ProductSerializer(serializers.ModelSerializer):
         images_data = validated_data.pop('uploaded_images', [])
         video_data = validated_data.pop('product_video', None)
         product = Product.objects.create(**validated_data)
-        
+
         for image in images_data:
             ProductImage.objects.create(product=product, image=image)
 
         if video_data:
             product.product_video = video_data
             product.save()
-        
+
         return product
-    
+
     def update(self, instance, validated_data):
         images = validated_data.pop('uploaded_images', None)
         video_data = validated_data.pop('product_video', None)
@@ -77,7 +98,7 @@ class ProductSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-        
+
         if images:
             for image in images:
                 ProductImage.objects.create(product=instance, image=image)
@@ -89,7 +110,7 @@ class ProductSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        
+
         # Check if product_video exists
         if instance.product_video:
             request = self.context.get('request')
@@ -101,5 +122,5 @@ class ProductSerializer(serializers.ModelSerializer):
 
             # Set the full video URL in the response
             representation['product_video'] = video_url
-    
+
         return representation

@@ -6,8 +6,8 @@ admin.site.register(ProductImage)
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'is_active', 'price', 'stock')
-    list_filter = ('is_active', 'category')
+    list_display = ('name', 'is_active', 'is_best_seller', 'price', 'stock')
+    list_filter = ('is_active', 'category', 'is_best_seller')
     search_fields = ('name', 'sku', 'description')
     actions = ['make_active', 'make_inactive']
 
@@ -20,4 +20,3 @@ class ProductAdmin(admin.ModelAdmin):
     def make_inactive(self, request, queryset):
         updated = queryset.update(is_active=False)
         self.message_user(request, f"{updated} products were deactivated.")
-

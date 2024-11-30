@@ -34,7 +34,8 @@ class ProductViewSet(viewsets.ModelViewSet):
         color = self.request.query_params.get("color")
         category_id = self.request.query_params.get("category")
         order_by_price = self.request.query_params.get("order_by_price")
-        search = self.request.query_params.get("search")  # New search parameter
+        search = self.request.query_params.get("search")
+        best_seller = self.request.query_params.get("best_seller")  
 
         # Apply filters dynamically
 
@@ -52,6 +53,11 @@ class ProductViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(color__icontains=color)
         if category_id:
             queryset = queryset.filter(category_id=category_id)
+        # Filter by best seller if the parameter is provided
+        if best_seller is not None:
+            # Convert to boolean
+            best_seller_bool = best_seller.lower() in ["true", "1", "yes"]
+            queryset = queryset.filter(is_best_seller=best_seller_bool)
 
         # Search functionality: filter across name and description
         if search:

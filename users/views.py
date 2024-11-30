@@ -104,13 +104,14 @@ class LoginView(GenericAPIView):
                 max_age=864000,
             )
             response.data = {
+                "name": user.username,
                 "access": access_token,
                 "refresh": refresh_token,
             }
             return response
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 class LogoutView(GenericAPIView):
     """
     User Logout and Delete Cookie.
@@ -193,7 +194,7 @@ class RefreshTokenView(GenericAPIView):
         return Response(
             {"detail": "Refresh token not provided"}, status=status.HTTP_400_BAD_REQUEST
         )
-        
+
 class ChangePasswordView(GenericAPIView):
     """
     Change Password.

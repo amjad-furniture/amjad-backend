@@ -38,6 +38,7 @@ from products.views import (
     ProductImageViewSet,
     ProductsByCategoryView,
     DashboardStatsView,
+    ReviewViewSet,
 )
 from support.views import SupportViewSet
 
@@ -47,7 +48,6 @@ router = DefaultRouter()
 router.register(r'categories', CategoryViewSet)
 router.register(r'products', ProductViewSet)
 router.register(r'product-images', ProductImageViewSet)
-
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -116,6 +116,16 @@ urlpatterns = [
         name="products_by_category",
     ),
     path("dashboard-stats/", DashboardStatsView.as_view(), name="dashboard_stats"),
+    path(
+        "reviews/",
+        ReviewViewSet.as_view(
+            {
+                "get": "list",
+                "post": "create",
+            }
+        ),
+        name="reviews-list-create",
+    ),
 ]
 
 

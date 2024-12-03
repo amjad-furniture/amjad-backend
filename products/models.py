@@ -133,3 +133,8 @@ class ProductImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.product.name}"
+
+
+class Review(models.Model):
+    name = models.CharField(unique=True, max_length=100, verbose_name="name")
+    review = models.TextField(blank=True, null=True, verbose_name="review")

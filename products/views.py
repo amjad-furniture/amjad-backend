@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-from .models import Product, ProductImage
-from .serializers import ProductSerializer, ProductImageSerializer
+from .models import Product, ProductImage,Review
+from .serializers import ProductSerializer, ProductImageSerializer, ReviewSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from categories.models import Category
 from support.models import Support
@@ -256,3 +256,53 @@ class DashboardStatsView(APIView):
         }
 
         return Response(data)
+
+
+class ReviewView(APIView):
+    def get(self, request):
+        reviews = Review.objects.all()
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+
+    def create(self, request, *args, **kwargs):
+        """
+        Custom create method to handle review creation with more detailed response
+        """
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+
+            return Response(
+                {"review": serializer.data},
+                status=status.HTTP_201_CREATED,
+            )
+
+        except serializers.ValidationError as e:
+            return Response(
+                {"error": "Validation failed", "details": serializer.errors},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    def list(self, request, *args, **kwargs):
+        """
+        Custom list method to return reviews with a custom response structure
+        """
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response({"total_reviews": queryset.count(), "reviews": serializer.data})

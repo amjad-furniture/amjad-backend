@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Category, Product, ProductImage
+from .models import Category, Product, ProductImage, Review
 from categories.serializers import CategorySerializer
 
 
@@ -124,3 +124,9 @@ class ProductSerializer(serializers.ModelSerializer):
             representation['product_video'] = video_url
 
         return representation
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "name", "review"]

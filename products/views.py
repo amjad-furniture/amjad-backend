@@ -298,6 +298,15 @@ class ReviewViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+    # def list(self, request, *args, **kwargs):
+    #     """
+    #     Custom list method to return reviews with a custom response structure
+    #     """
+    #     queryset = self.filter_queryset(self.get_queryset())
+    #     serializer = self.get_serializer(queryset, many=True)
+
+    #     return Response({"total_reviews": queryset.count(), "reviews": serializer.data})
+    
     def list(self, request, *args, **kwargs):
         """
         Custom list method to return reviews with a custom response structure

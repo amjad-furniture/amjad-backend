@@ -28,7 +28,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
@@ -105,24 +105,13 @@ WSGI_APPLICATION = 'furniture.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Update Database configuration
 DATABASES = {
     "default": dj_database_url.config(
-        default=os.getenv("POSTGRES_URL"),
+        default=os.getenv("DATABASE_URL"),
         conn_max_age=600,
     )
 }
-
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.postgresql",
-#         "NAME": "amjad-furniture",
-#         "USER": "postgres",
-#         "PASSWORD": os.getenv("LOCALPASSWORD"),
-#         "HOST": "localhost",
-#         "PORT": "5432",
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -241,23 +230,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
-ALLOWED_HOSTS = [
-    "104.248.251.235",
-]
-ALLOWED_HOSTS = ['*']
+# Update ALLOWED_HOSTS
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
-# Edit these values in production!
-CORS_ALLOWED_ORIGINS = [
-    "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
-    "http://localhost:3000",
-]
-# Allow all HTTP methods and headers
-CORS_ALLOW_METHODS = ["GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS"]
-CORS_ALLOW_HEADERS = ["*"]
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOW_CREDENTIALS = True
+# Update CORS settings for production
+CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', '').split(',')
+CORS_ORIGIN_ALLOW_ALL = False  # Set to False in production
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://amjad-backend-production.up.railway.app",
-    "https://furniture-website-2u9x-git-main-shimaas-projects-363e1876.vercel.app",
-]
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',')

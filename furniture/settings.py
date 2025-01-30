@@ -244,9 +244,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = "users.User"
 
-ALLOWED_HOSTS = [
-    "104.248.251.235",
-]
 ALLOWED_HOSTS = ['*']
 
 # Update CORS settings for production

@@ -21,7 +21,8 @@ from django.core.management.utils import get_random_secret_key
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv()
-DEBUG = False
+DEBUG = True
+# DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 
 # Quick-start development settings - unsuitable for production
@@ -30,8 +31,7 @@ DEBUG = False
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', get_random_secret_key())
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+# # SECURITY WARNING: don't run with debug turned on in production!
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 

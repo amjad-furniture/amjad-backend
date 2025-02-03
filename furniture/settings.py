@@ -180,7 +180,7 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": False,
     # Security settings
     "ALGORITHM": "HS256",  # Consider RS256 for added security(asymmetric encryption)
-    "SIGNING_KEY": os.getenv("SECRET_KEY"),
+    "SIGNING_KEY": os.getenv("DJANGO_SECRET_KEY"),
     "VERIFYING_KEY": None,  # Set if using asymmetric encryption
     "LEEWAY": 0,  # Adjust to allow for clock skew
     # Custom JWT claims

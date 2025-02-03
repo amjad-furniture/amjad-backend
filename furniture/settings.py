@@ -119,8 +119,8 @@ WSGI_APPLICATION = 'furniture.wsgi.application'
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("NAME"),
-        "USER": os.getenv("USER"),
+        "NAME": "amgad",
+        "USER": "postgres",
         "PASSWORD": os.getenv("LOCALPASSWORD"),
         "HOST": "localhost",
         "PORT": "5432",

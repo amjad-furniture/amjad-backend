@@ -11,7 +11,7 @@ class User(AbstractUser):
     Custom user model with unique username as the primary identifier.
     """
     username = models.CharField(max_length=50, unique=True)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15)
     email = models.EmailField(unique=True, blank=True, null=True)
 
 

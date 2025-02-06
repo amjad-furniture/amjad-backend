@@ -24,7 +24,3 @@ class CategorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Category name must be at least 3 characters long.")
         return value
 
-    def validate_icon(self, value):
-        if value and value.size > 2 * 1024 * 1024:  # 2MB size limit
-            raise serializers.ValidationError("Icon size must not exceed 2MB.")
-        return value

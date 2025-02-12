@@ -12,7 +12,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at']
         
     def validate_image(self, value):
-        if not value.name.lower().endswith(('.png', '.jpg', '.jpeg')):
+        if not value.name.lower().endswith(('.png', '.jpg', '.jpeg','arw')):
             raise serializers.ValidationError("Only PNG, JPG, and JPEG images are allowed.")
         if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError("Image file size should not exceed 5MB.")

@@ -25,7 +25,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=12, unique=True, blank=True, editable=False, verbose_name="SKU")
     slug = models.SlugField(max_length=100, unique=True, blank=True, allow_unicode=True, verbose_name="Slug")
     description = models.TextField(blank=True, null=True, verbose_name="Description")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Price", null=True, blank=True)
     color = models.CharField(max_length=50, verbose_name="Color", blank=True, null=True)
     length_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Length (cm)")
     width_cm = models.DecimalField(max_digits=5, decimal_places=1, null=True, blank=True, verbose_name="Width (cm)")
